@@ -5,7 +5,7 @@
 #include "file-operations.h"
 
 // Open a file with specified path and mode
-FILE *open_file(const char *file_path, const char *mode) {
+FILE* open_file(const char* file_path, const char* mode) {
     // Try to open file with specified path and mode
     FILE *file = fopen(file_path, mode);
     // Return error if file doesn't exist
@@ -17,19 +17,25 @@ FILE *open_file(const char *file_path, const char *mode) {
     return file;
 }
 
-// Print the contents of a file to the console
-void print_content(FILE *file) {
-    // Define buffer to temporarily hold read content
-    char buffer[1024];
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        // Read lines from file until EOF. fgets reads a line or a max of 1023
-        // characters (one less than buffer size, leaving space for null terminator)
-        printf("%s", buffer); // Print content to console
+// Read an open file
+char* read_file(FILE* file) {
+    // Check if file is valid
+    if (!file) {
+        fprintf(stderr, "File not opened\n");
+        return NULL;
     }
+
+    // Get file size using get_file_size
+    fseek(file, 0, SEEK_SET); // Set file pointer at beginning of file
+    long length = get_file_size(file);
+    if (length == -1) {
+        
+    }
+
 }
 
 // Close an opened file
-void close_file(FILE *file) {
+void close_file(FILE* file) {
     if(file) {
         // if file pointer isn't null, close file
         fclose(file);
@@ -37,7 +43,7 @@ void close_file(FILE *file) {
 }
 
 // Get size of a file
-size_t get_file_size(const char *file_path) {
+size_t get_file_size(const char* file_path) {
     // Open file in read mode
     FILE *file = open_file(file_path, 'r');
     // Handle errors in file opening
@@ -55,4 +61,16 @@ size_t get_file_size(const char *file_path) {
     close_file(file);
     // Return file size
     return size;
+}
+
+// Writes specified content to a provided file object
+void write_to_file(FILE* file, const char* content) {
+    if (file && content) {
+        // Writes to file if both file and content exist
+        fputs(content, file);
+    }
+}
+
+void move_file() {
+
 }
