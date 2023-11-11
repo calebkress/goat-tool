@@ -2,6 +2,7 @@
 #define FILE_OPERATIONS_H
 
 #include <stdio.h> // Include necessary standard library header
+#include <sys/stat.h>
 
 // Function prototypes
 FILE* open_file(const char* file_path, const char* mode);

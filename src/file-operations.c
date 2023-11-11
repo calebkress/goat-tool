@@ -13,32 +13,48 @@ FILE* open_file(const char* file_path, const char* mode) {
         perror("Error opening file.");
         return NULL;
     }
-    // Return opened file
+    // Return opened file pointer
     return file;
-}
-
-// Read an open file
-char* read_file(FILE* file) {
-    // Check if file is valid
-    if (!file) {
-        fprintf(stderr, "File not opened\n");
-        return NULL;
-    }
-
-    // Get file size using get_file_size
-    fseek(file, 0, SEEK_SET); // Set file pointer at beginning of file
-    long length = get_file_size(file);
-    if (length == -1) {
-        
-    }
-
 }
 
 // Close an opened file
 void close_file(FILE* file) {
     if(file) {
-        // if file pointer isn't null, close file
+        // If file pointer isn't null, close file
         fclose(file);
+    }
+}
+
+// Read an open file's contents
+char* read_file(const char* file_path) {
+    // Get file size using file path
+    long length = get_file_size(file_path);  
+    if (length < 0) {
+        return NULL;  // Return NULL if file size couldn't be determined
+    }
+
+    // Open file for reading
+    FILE* file = open_file(file_path, "r");  
+    if (!file) {
+        return NULL;  // Return NULL if file couldn't be opened
+    } 
+
+    // Allocate memory for file content
+    char* content = (char*) malloc(length + 1);  
+    if (content) {
+        fread(content, 1, length, file);  // Read file into buffer
+        content[length] = '\0';  // Null-terminate string
+    }
+
+    close_file(file);  // Close file
+    return content;  // Return file content
+}
+
+// Writes specified content to a provided file object
+void write_to_file(FILE* file, const char* content) {
+    if (file && content) {
+        // Writes to file if both file and content exist
+        fputs(content, file);
     }
 }
 
@@ -63,14 +79,14 @@ size_t get_file_size(const char* file_path) {
     return size;
 }
 
-// Writes specified content to a provided file object
-void write_to_file(FILE* file, const char* content) {
-    if (file && content) {
-        // Writes to file if both file and content exist
-        fputs(content, file);
+// Retrieve permissions of given file
+int get_file_permissions(const char* file_path) {
+    // Define struct of type stat to get file info
+    struct stat st;
+    if (stat(file_path, &st) == 0) {
+        return st.st_mode & 0777;  // Return file permissions, isolating permission bits
+    } else {
+        perror("Error getting file permissions");
+        return -1;  // Return -1 on error
     }
-}
-
-void move_file() {
-
 }
