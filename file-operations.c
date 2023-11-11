@@ -28,3 +28,10 @@ void print_content(FILE *file) {
     }
 }
 
+// Close an opened file
+void close_file(FILE *file) {
+    if(file) {
+        // if file pointer isn't null, close file
+        fclose(file);
+    }
+}
