@@ -23,6 +23,11 @@
 *.exe
 *.out
 *.app
+GoatTool
+main
+string-operations
+file-operations
+utilities
 
 # Debug files
 *.dSYM/
