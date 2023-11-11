@@ -91,20 +91,47 @@ int get_file_permissions(const char* file_path) {
     }
 }
 
-// Merge multiple files into a single file
+// Multithreading setup
+// Struct for thread args
+typedef struct {
+    const char* file_path;
+    char* content;
+} ThreadArgs;
+
+// Thread fn to read file content
+void* read_file_thread(void* args) {
+    ThreadArgs* thread_args = (ThreadArgs*)args;
+    thread_args->content = read_file(thread_args->file_path);
+    return NULL;
+}
+
+// Merge multiple files into a single file using multithreading
 void merge_files(const char* const* input_paths, int num_files, const char* output_path) {
-     FILE* output_file = open_file(output_path, "w");
-    if (!output_file) return;  // Exit if output file can't be opened
+    pthread_t threads[num_files];
+    ThreadArgs thread_args[num_files];
 
+    // Create threads for each file
     for (int i = 0; i < num_files; ++i) {
-        char* content = read_file(input_paths[i]);  // Read content from each input file
-        if (!content) continue;  // Skip if content couldn't be read
-
-        write_to_file(output_file, content);  // Write content to output file
-        free(content);  // Free allocated buffer
+        thread_args[i].file_path = input_paths[i];
+        pthread_create(&threads[i], NULL, read_file_thread, &thread_args[i]);
     }
 
-    close_file(output_file);  // Close output file
+    // Join threads
+    for (int i = 0; i < num_files; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Merge content from all threads into output file
+    FILE* output_file = open_file(output_path, "w");
+    if (output_file) {
+        for (int i = 0; i < num_files; ++i) {
+            if (thread_args[i].content) {
+                write_to_file(output_file, thread_args[i].content);
+                free(thread_args[i].content);  // Free memory allocated in thread
+            }
+        }
+        close_file(output_file);
+    }
 }
 
 // Move a file from one path to another
