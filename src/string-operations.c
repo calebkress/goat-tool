@@ -1,8 +1,5 @@
 #include "../headers/string-operations.h"
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
+
 
 // Function to check if a substring exists in a string
 int contains(const char *line, const char *substring) {
