@@ -7,10 +7,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+
 // Open a file with specified path and mode
 FILE* open_file(const char* file_path, const char* mode) {
     // Try to open file with specified path and mode
-    FILE *file = fopen(file_path, mode);
+    FILE* file = fopen(file_path, mode);
     // Return error if file doesn't exist
     if (!file) {
         perror("Error opening file.");
@@ -64,7 +65,7 @@ void write_to_file(FILE* file, const char* content) {
 // Get size of a file
 size_t get_file_size(const char* file_path) {
     // Open file in read mode
-    FILE *file = open_file(file_path, 'r');
+    FILE *file = open_file(file_path, "r");
     // Handle errors in file opening
     if (!file) {
         // Return 0 if file doesn't exist

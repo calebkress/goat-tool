@@ -1,5 +1,8 @@
 #include "../headers/string-operations.h"
-
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // Function to check if a substring exists in a string
 int contains(const char *line, const char *substring) {
@@ -65,38 +68,4 @@ void decompress_content(const char *input, char *output) {
     }
 
     output[j] = '\0'; // Null-terminate the output string
-}
-
-int main() {
-    // Test the contains function
-    const char* line = "Hello, world!";
-    const char* substring = "world";
-    if (contains(line, substring)) {
-        printf("'%s' contains '%s'\n", line, substring);
-    } else {
-        printf("'%s' does not contain '%s'\n", line, substring);
-    }
-
-    // Test the search_string_in_line function
-    const char* search_line = "This is a test line.";
-    const char* search_string = "test";
-    if (search_string_in_line(search_line, search_string)) {
-        printf("'%s' contains '%s'\n", search_line, search_string);
-    } else {
-        printf("'%s' does not contain '%s'\n", search_line, search_string);
-    }
-
-    // Test the compress_content function
-    const char* input = "aaabbbccddddd";
-    char output[100];
-    compress_content(input, output);
-    printf("Compressed: %s\n", output);
-
-    // Test the decompress_content function
-    const char* compressed_input = "a3b3c2d5";
-    char decompressed_output[100];
-    decompress_content(compressed_input, decompressed_output);
-    printf("Decompressed: %s\n", decompressed_output);
-
-    return 0;
 }

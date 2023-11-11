@@ -2,6 +2,7 @@
 #define FILE_OPERATIONS_H
 
 #include <stdlib.h>
+#include <stdio.h>
 
 // Function prototypes:
 // Function to open a file with given mode (r, w, etc.)

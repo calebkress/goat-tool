@@ -14,18 +14,18 @@ int main(int argc, char *argv[]) {
     // Process the switch (command-line argument)
     char *switch_arg = argv[1];
     if (strcmp(switch_arg, "-p") == 0) {
-        // Print the contents of the file(s)
+        // Print contents of file(s)
         for (int i = 2; i < argc; i++) {
-            print_content(argv[i]);
+            print_content(argv[i]);  // Directly pass the file path
         }
     } else if (strcmp(switch_arg, "-s") == 0) {
-        // Print the size of the file(s)
+        // Print size of file(s)
         for (int i = 2; i < argc; i++) {
             size_t size = get_file_size(argv[i]);
             printf("Size of %s: %zu bytes\\n", argv[i], size);
         }
     } else if (strcmp(switch_arg, "-q") == 0) {
-        // Print the permissions of the file(s)
+        // Print permissions of file(s)
         for (int i = 2; i < argc; i++) {
             int permissions = get_file_permissions(argv[i]);
             printf("Permissions of %s: %03o\\n", argv[i], permissions);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
             printf("Error: Insufficient arguments for merge operation\\n");
             return 1;
         }
-        merge_files(argv + 2, argc - 3, argv[argc - 1]);
+        merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
     } else if (strcmp(switch_arg, "-n") == 0) {
         // Move a file
         if (argc != 4) {
