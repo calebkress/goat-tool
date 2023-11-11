@@ -35,3 +35,24 @@ void close_file(FILE *file) {
         fclose(file);
     }
 }
+
+// Get size of a file
+size_t get_file_size(const char *file_path) {
+    // Open file in read mode
+    FILE *file = open_file(file_path, 'r');
+    // Handle errors in file opening
+    if (!file) {
+        // Return 0 if file doesn't exist
+        return 0;
+    }
+
+    // Move file pointer to end of file
+    fseek(file, 0, SEEK_END);
+    // Tell position of file pointer (now at end), giving file size
+    size_t size = ftell(file);
+
+    // Close file
+    close_file(file);
+    // Return file size
+    return size;
+}
