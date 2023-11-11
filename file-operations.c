@@ -56,3 +56,12 @@ size_t get_file_size(const char *file_path) {
     // Return file size
     return size;
 }
+
+// Writes specified content to a provided file object
+void write_to_file(FILE *file, const char *content) {
+    if (file && content) {
+        // Writes to file if both file and content exist
+        fputs(content, file);
+    }
+}
+
