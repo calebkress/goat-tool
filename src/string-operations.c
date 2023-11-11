@@ -1,4 +1,5 @@
 #include "../headers/string-operations.h"
+#include "../headers/file-operations.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -68,4 +69,35 @@ void decompress_content(const char *input, char *output) {
     }
 
     output[j] = '\0'; // Null-terminate the output string
+}
+
+void search_string_in_file(const char* file_path, const char* search_string) {
+    // Use the open_file function to open the file for reading
+    FILE *file = open_file(file_path, "r");
+
+    // Check if file was successfully opened
+    if (!file) {
+        // If open_file returned NULL, file couldn't be opened
+        printf("Error: Unable to open file %s\n", file_path);
+        return;  // Exit function early if file opening fails
+    }
+
+    char *line = NULL;   // Pointer for storing current line
+    size_t len = 0;      // Length of line
+    ssize_t read;        // Number of characters read
+
+    // Read file line by line
+    while ((read = getline(&line, &len, file)) != -1) {
+        // Check if current line contains search string
+        if (search_string_in_line(line, search_string)) {
+            // If line contains string, print it to console
+            printf("%s", line);
+        }
+    }
+
+    // After reading file, free memory allocated for 'line'
+    free(line);
+
+    // Use close_file function to close file
+    close_file(file);
 }
