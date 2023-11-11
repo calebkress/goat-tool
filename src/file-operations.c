@@ -90,3 +90,26 @@ int get_file_permissions(const char* file_path) {
         return -1;  // Return -1 on error
     }
 }
+
+// Merge multiple files into a single file
+void merge_files(const char* const* input_paths, int num_files, const char* output_path) {
+     FILE* output_file = open_file(output_path, "w");
+    if (!output_file) return;  // Exit if output file can't be opened
+
+    for (int i = 0; i < num_files; ++i) {
+        char* content = read_file(input_paths[i]);  // Read content from each input file
+        if (!content) continue;  // Skip if content couldn't be read
+
+        write_to_file(output_file, content);  // Write content to output file
+        free(content);  // Free allocated buffer
+    }
+
+    close_file(output_file);  // Close output file
+}
+
+// Move a file from one path to another
+void move_file(const char* source_path, const char* destination_path) {
+    if (rename(source_path, destination_path) != 0) {
+        perror("Error moving file");  // Print error if rename fails
+    }
+}
