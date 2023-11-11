@@ -2,7 +2,7 @@
 // open_file, read_file, print_content, close_file, get_file_size,
 // create_new_file, write_to_file, move_file, and rename_file.
 
-#include "file-operations.h"
+#include "../headers/file-operations.h"
 
 // Open a file with specified path and mode
 FILE* open_file(const char* file_path, const char* mode) {
