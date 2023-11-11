@@ -1,0 +1,8 @@
+//
+// Created by Michael Sychev on 11/11/23.
+//
+
+#ifndef GOATTOOL_STRING_OPERATIONS_H
+#define GOATTOOL_STRING_OPERATIONS_H
+
+#endif //GOATTOOL_STRING_OPERATIONS_H
