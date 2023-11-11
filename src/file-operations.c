@@ -3,6 +3,10 @@
 // create_new_file, write_to_file, move_file, and rename_file.
 
 #include "../headers/file-operations.h"
+#include <stdio.h>
+#include <sys/stat.h>
+#include <pthread.h>
+#include <string.h>
 
 // Open a file with specified path and mode
 FILE* open_file(const char* file_path, const char* mode) {
