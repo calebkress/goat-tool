@@ -1,0 +1,5 @@
+This is a test file for the GoatTool project.
+It contains multiple lines of text,
+including numbers like 12345 and special characters @#$%.
+This line is meant to be duplicated: duplicate duplicate duplicate duplicate.
+End of test file.
