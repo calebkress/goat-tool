@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "stat.h": "c",
+        "utilities.h": "c",
+        "file-operations.h": "c"
     }
 }
