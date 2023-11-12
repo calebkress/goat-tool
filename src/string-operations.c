@@ -15,61 +15,63 @@ int search_string_in_line(const char *line, const char *string) {
     return contains(line, string);
 }
 
-// Compresses content using the specified scheme
 void compress_content(const char *input, char *output) {
-    int count = 0;
+    int count = 1;  // Start count from 1
     char last_char = input[0];
+    char buffer[128];  // Temporary buffer for sprintf
+    output[0] = '\0';  // Initialize output as empty string
 
-    for (int i = 0; input[i] != '\0'; i++) {
-        if (input[i] == last_char) {
+    for (int i = 1; input[i] != '\0'; i++) {
+        if (input[i] == ' ') {
+            // Append last_char and count to output, then add space
+            sprintf(buffer, "%c%d ", last_char, count);
+            strcat(output, buffer);
+            last_char = input[++i];  // Skip space and move to next character
+            count = 1;
+        } else if (input[i] == last_char) {
             count++;
         } else {
-            if (last_char == ' ') {
-                sprintf(output, "%s1 ", output);
-            } else {
-                sprintf(output, "%s%c%d", output, last_char, count);
-            }
-            count = 1;
+            // Append last_char and count to output
+            sprintf(buffer, "%c%d", last_char, count);
+            strcat(output, buffer);
             last_char = input[i];
+            count = 1;
         }
     }
 
-    // Handle the last sequence
-    if (last_char == ' ') {
-        sprintf(output, "%s1 ", output);
-    } else {
-        sprintf(output, "%s%c%d", output, last_char, count);
-    }
+    // Handle last sequence
+    sprintf(buffer, "%c%d", last_char, count);
+    strcat(output, buffer);
 }
 
 // Decompresses content from the specified scheme
 void decompress_content(const char *input, char *output) {
-    int i = 0, j = 0, num;
+    int i = 0, j = 0, count;
     char ch;
 
     while (input[i] != '\0') {
-        if (isdigit(input[i])) {
-            // Read the number (count of characters)
-            num = atoi(&input[i]);
+        ch = input[i++];  // Read character
 
-            while (isdigit(input[i])) i++;
-
-            // Expand the character sequence
-            for (int k = 0; k < num; k++, j++) {
-                output[j] = ch;
-            }
+        if (ch == ' ') {
+            output[j++] = ' ';  // Copy space as-is
         } else {
-            ch = input[i++];
-            // Special handling for space character
-            if (ch == '1' && input[i] == ' ') {
-                output[j++] = ' ';
-                i++; // Skip the space after '1'
+            // Read count of characters
+            count = 0;
+            while (isdigit(input[i])) {
+                count = count * 10 + (input[i] - '0');
+                i++;
+            }
+
+            // Expand character sequence
+            for (int k = 0; k < count; k++) {
+                output[j++] = ch;
             }
         }
     }
 
-    output[j] = '\0'; // Null-terminate the output string
+    output[j] = '\0'; // Null-terminate output string
 }
+
 
 void search_string_in_file(const char* file_path, const char* search_string) {
     // Use the open_file function to open the file for reading

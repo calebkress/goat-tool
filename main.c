@@ -44,19 +44,84 @@ int main(int argc, char *argv[]) {
         }
         merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
     } else if (strcmp(switch_arg, "-c") == 0) {
+        // Compress file into .goat format
         if (argc != 4) {
             printf("Error: Incorrect number of arguments for compression operation\n");
             return 1;
         }
-        // Compress file contents
-        compress_content(argv[2], argv[3]);
+
+        // Read content of input file
+        char* input_content = read_file(argv[2]);
+        if (!input_content) {
+            printf("Error: Unable to read file %s\n", argv[2]);
+            return 1;
+        }
+
+        // Prepare buffer for compressed content
+        char* compressed_content = malloc(strlen(input_content) * 2); // Allocate enough memory
+        if (!compressed_content) {
+            printf("Error: Memory allocation failed\n");
+            free(input_content);
+            return 1;
+        }
+
+        // Compress content
+        compress_content(input_content, compressed_content);
+
+        // Write compressed content to output file
+        FILE* output_file = open_file(argv[3], "w");
+        if (!output_file) {
+            printf("Error: Unable to open file %s for writing\n", argv[3]);
+            free(input_content);
+            free(compressed_content);
+            return 1;
+        }
+        write_to_file(output_file, compressed_content);
+
+        // Clean up
+        close_file(output_file);
+        free(input_content);
+        free(compressed_content);
     } else if (strcmp(switch_arg, "-d") == 0) {
+        // Decompress a .goat file
         if (argc != 4) {
             printf("Error: Incorrect number of arguments for decompression operation\n");
             return 1;
         }
-        // Decompress file contents
-        decompress_content(argv[2], argv[3]);
+
+        // Step 1: Read the content of the compressed input file
+        char* compressed_content = read_file(argv[2]);
+        if (!compressed_content) {
+            printf("Error: Unable to read file %s\n", argv[2]);
+            return 1;
+        }
+
+        // Prepare buffer for decompressed content
+        // Assuming decompressed content might be larger than the compressed data
+        char* decompressed_content = malloc(strlen(compressed_content) * 2); // Allocate enough memory
+        if (!decompressed_content) {
+            printf("Error: Memory allocation failed\n");
+            free(compressed_content);
+            return 1;
+        }
+
+        // Decompress content
+        decompress_content(compressed_content, decompressed_content);
+
+        // Write decompressed content to output file
+        FILE* output_file = open_file(argv[3], "w");
+        if (!output_file) {
+            printf("Error: Unable to open file %s for writing\n", argv[3]);
+            free(compressed_content);
+            free(decompressed_content);
+            return 1;
+        }
+        write_to_file(output_file, decompressed_content);
+
+        // Clean up
+        close_file(output_file);
+        free(compressed_content);
+        free(decompressed_content);
     } else if (strcmp(switch_arg, "-n") == 0) {
         // Move a file
         if (argc != 4) {
