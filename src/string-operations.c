@@ -74,19 +74,30 @@ void decompress_content(const char *input, char *output) {
 
 
 void search_string_in_file(const char* file_path, const char* search_string) {
-    // Use the open_file function to open the file for reading
+    // Check if file_path or search_string is NULL or empty
+    if (!file_path || !search_string || strlen(file_path) == 0 || strlen(search_string) == 0) {
+        if (!file_path || strlen(file_path) == 0) {
+            printf("ERROR: File not specified.\n");
+        } else {
+            printf("ERROR: Search string not specified.\n");
+        }
+        return;
+    }
+
+    // Use open_file function to open file for reading
     FILE *file = open_file(file_path, "r");
 
     // Check if file was successfully opened
     if (!file) {
         // If open_file returned NULL, file couldn't be opened
-        printf("Error: Unable to open file %s\n", file_path);
+        printf("ERROR: File does not exist.\n");
         return;  // Exit function early if file opening fails
     }
 
     char *line = NULL;   // Pointer for storing current line
     size_t len = 0;      // Length of line
     ssize_t read;        // Number of characters read
+    int found = 0;       // Flag to check if string is found
 
     // Read file line by line
     while ((read = getline(&line, &len, file)) != -1) {
@@ -94,6 +105,7 @@ void search_string_in_file(const char* file_path, const char* search_string) {
         if (search_string_in_line(line, search_string)) {
             // If line contains string, print it to console
             printf("%s", line);
+            found = 1;
         }
     }
 
@@ -102,4 +114,9 @@ void search_string_in_file(const char* file_path, const char* search_string) {
 
     // Use close_file function to close file
     close_file(file);
+
+    // If string not found in the file, print error message
+    if (!found) {
+        printf("String not found.\n");
+    }
 }
