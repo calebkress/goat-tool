@@ -19,16 +19,37 @@ int main(int argc, char *argv[]) {
             print_content(argv[i]);  // Directly pass the file path
         }
     } else if (strcmp(switch_arg, "-g") == 0) {
-        if (argc != 4) {
-            printf("Error: Incorrect number of arguments for search operation\n");
-            return 1;
+        // Handle -g switch for searching strings in a file
+        if (argc == 2) {
+            // No file or search string specified
+            printf("ERROR: File or search string not specified.\n");
+        } else if (argc == 3) {
+            // File specified but no search string
+            printf("ERROR: Search string not specified.\n");
+        } else if (argc > 4) {
+            // Too many arguments
+            printf("ERROR: Too many arguments for search operation.\n");
+        } else {
+            // Correct number of arguments, proceed with search
+            search_string_in_file(argv[2], argv[3]);
         }
-        search_string_in_file(argv[2], argv[3]);  // Search for string in file
     } else if (strcmp(switch_arg, "-s") == 0) {
-        // Print size of file(s)
-        for (int i = 2; i < argc; i++) {
-            size_t size = get_file_size(argv[i]);
-            printf("Size of %s: %zu bytes\n", argv[i], size);
+        if (argc == 2) {
+            printf("ERROR: No file specified.\n");
+        } else {
+            for (int i = 2; i < argc; i++) {
+                size_t size = get_file_size(argv[i]);
+                if (size == (size_t)-1) {
+                    printf("ERROR: File does not exist.\n");
+                } else if (size == (size_t)-2) {
+                    printf("ERROR: Incorrect file format.\n");
+                } else {
+                    // Extract just the file name from the path
+                    const char* file_name = strrchr(argv[i], '/');
+                    file_name = (file_name != NULL) ? file_name + 1 : argv[i];
+                    printf("Size of %s: %zu bytes\n", file_name, size);
+                }
+            }
         }
     } else if (strcmp(switch_arg, "-q") == 0) {
         // Print permissions of file(s)

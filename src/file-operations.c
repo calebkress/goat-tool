@@ -64,13 +64,20 @@ void write_to_file(FILE* file, const char* content) {
 
 // Get size of a file
 size_t get_file_size(const char* file_path) {
+    // Check for supported format first (ex: .doc files not supported)
+    const char *extension = strrchr(file_path, '.');
+    if (extension != NULL && strcmp(extension, ".doc") == 0) {
+        return (size_t)-2; // Special value for unsupported format
+    }
+
     // Open file in read mode
     FILE *file = open_file(file_path, "r");
     // Handle errors in file opening
     if (!file) {
-        // Return 0 if file doesn't exist
-        return 0;
+        // Return special value if file doesn't exist
+        return (size_t)-1;
     }
+
 
     // Move file pointer to end of file
     fseek(file, 0, SEEK_END);
