@@ -34,10 +34,22 @@ int main(int argc, char *argv[]) {
             search_string_in_file(argv[2], argv[3]);
         }
     } else if (strcmp(switch_arg, "-s") == 0) {
-        // Print size of file(s)
-        for (int i = 2; i < argc; i++) {
-            size_t size = get_file_size(argv[i]);
-            printf("Size of %s: %zu bytes\n", argv[i], size);
+        if (argc == 2) {
+            printf("ERROR: No file specified.\n");
+        } else {
+            for (int i = 2; i < argc; i++) {
+                size_t size = get_file_size(argv[i]);
+                if (size == (size_t)-1) {
+                    printf("ERROR: File does not exist.\n");
+                } else if (size == (size_t)-2) {
+                    printf("ERROR: Incorrect file format.\n");
+                } else {
+                    // Extract just the file name from the path
+                    const char* file_name = strrchr(argv[i], '/');
+                    file_name = (file_name != NULL) ? file_name + 1 : argv[i];
+                    printf("Size of %s: %zu bytes\n", file_name, size);
+                }
+            }
         }
     } else if (strcmp(switch_arg, "-q") == 0) {
         // Print permissions of file(s)
