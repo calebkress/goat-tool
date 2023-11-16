@@ -9,7 +9,7 @@
 void print_content(const char* file_path) {
     char* content = read_file(file_path);
     if (content) {
-        printf("%s\\n", content);
+        printf("%s\n", content);
         free(content);
     }
 }
