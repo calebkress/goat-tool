@@ -1,5 +1,8 @@
 # goat-tool
 A basic GCC command line tool.
 
-## Build Script
-    gcc main.c src/file_operations.c src/string_operations.c src/utilities.c -o GoatTool
+## Build Instructions
+1) Run the following command to make the build script executable: 
+    chmod +x build.sh
+2) Run the following command to build GoatTool:
+    ./build.sh    
