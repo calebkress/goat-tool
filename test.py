@@ -2,6 +2,7 @@ import subprocess
 import tempfile
 import unittest
 import os
+import stat
 
 # Base case tests (shared functions)
 class BaseTestGoatTool(unittest.TestCase):
@@ -10,6 +11,9 @@ class BaseTestGoatTool(unittest.TestCase):
         temp_file.write(content)
         temp_file.close()
         return temp_file.name
+    
+    def set_file_permissions(self, file_path, permissions):
+        os.chmod(file_path, permissions)
 
 # Tests for -p switch
 class TestGoatToolPrintFunction(BaseTestGoatTool):
@@ -115,6 +119,126 @@ class TestGoatToolFileSize(BaseTestGoatTool):
         result = subprocess.run(['./GoatTool', '-s', temp_file_path], capture_output=True, text=True)
         os.remove(temp_file_path)
         self.assertEqual(result.stdout, "ERROR: Incorrect file format.\n")
+
+
+# Tests for -m switch
+class TestGoatToolMergeFiles(BaseTestGoatTool):
+    
+    def test_merge_files_successfully(self):
+        file1_path = self.create_temp_file("Content of file 1")
+        file2_path = self.create_temp_file("Content of file 2")
+        merged_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt").name
+        result = subprocess.run(['./GoatTool', '-m', file1_path, file2_path, merged_file_path], capture_output=True, text=True)
+        os.remove(file1_path)
+        os.remove(file2_path)
+        os.remove(merged_file_path)
+        self.assertEqual(result.stdout, "Files merged successfully.\n")
+
+    def test_merge_with_nonexistent_file(self):
+        file1_path = self.create_temp_file("Content of file 1")
+        merged_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt").name
+        result = subprocess.run(['./GoatTool', '-m', 'nonexistent_file.txt', file1_path, merged_file_path], capture_output=True, text=True)
+        os.remove(file1_path)
+        os.remove(merged_file_path)
+        self.assertIn("ERROR: nonexistent_file.txt does not exist.", result.stdout)
+
+    def test_merge_no_files_specified(self):
+        result = subprocess.run(['./GoatTool', '-m'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: Files to merge not specified.\n")
+
+    def test_merge_no_destination_file_specified(self):
+        file1_path = self.create_temp_file("Content")
+        result = subprocess.run(['./GoatTool', '-m', file1_path], capture_output=True, text=True)
+        os.remove(file1_path)
+        self.assertEqual(result.stdout, "ERROR: Destination file not specified.\n")
+
+    def test_merge_to_nonexistent_directory(self):
+        file1_path = self.create_temp_file("Content")
+        result = subprocess.run(['./GoatTool', '-m', file1_path, 'nonexistent_directory/merged.txt'], capture_output=True, text=True)
+        os.remove(file1_path)
+        self.assertIn("ERROR: Destination directory does not exist.", result.stdout)
+
+# TODO: Tests for -c switch
+# class TestGoatToolCompressFunction(unittest.TestCase):
+
+#     def test_compress_file_ssuccessfully(self):
+#         temp_file_path = self.create_temp_file("Normal file content", ".txt")
+#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+#         result = subprocess.run(['./GoatTool', '-c', temp_file_path, compressed_file_path], 
+#         capture_output=True, text=True)
+#         os.remove(temp_file_path)
+#         os.remove(compressed_file_path)
+#         self.assertEqual(result.stdout, "File compressed successfully.\n")
+
+#     def test_compress_nonexistent_file(self):
+#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+#         result = subprocess.run(['./GoatTool', '-c', 'nonexistent_file.txt', compressed_file_path], capture_output=True, text=True)
+#         os.remove(compressed_file_path)
+#         self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+
+#     def test_compress_no_input_file_specified(self):
+#         result = subprocess.run(['./GoatTool', '-c'], capture_output=True, text=True)
+#         self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
+
+#     def test_compress_no_output_file_specified(self):
+#         temp_file_path = self.create_temp_file("Normal file content", ".txt")
+#         result = subprocess.run(['./GoatTool', '-c', temp_file_path], capture_output=True, text=True)
+#         os.remove(temp_file_path)
+#         self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
+
+#     def test_compress_unsupported_format(self):
+#         temp_file_path = self.create_temp_file("Content", ".doc")
+#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+#         result = subprocess.run(['./GoatTool', '-c', temp_file_path, compressed_file_path], capture_output=True, text=True)
+#         os.remove(temp_file_path)
+#         os.remove(compressed_file_path)
+#         self.assertEqual(result.stdout, "ERROR: Unsupported file format for compression.\n")
+
+# TODO: Tests for -d switch
+
+
+# Tests for -q switch
+class TestGoatToolPrintPermissions(BaseTestGoatTool):
+
+    def test_print_permissions_existing_file(self):
+        temp_file_path = self.create_temp_file("Content")
+        self.set_file_permissions(temp_file_path, 0o755)  # Set permissions to 755
+        result = subprocess.run(['./GoatTool', '-q', temp_file_path], capture_output=True, text=True)
+        os.remove(temp_file_path)
+        expected_output = f"Permissions of {os.path.basename(temp_file_path)}: 755\n"
+        self.assertEqual(result.stdout, expected_output)
+
+
+
+    def test_print_permissions_nonexistent_file(self):
+        result = subprocess.run(['./GoatTool', '-q', 'nonexistent_file.txt'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+
+    def test_print_permissions_no_file_specified(self):
+        result = subprocess.run(['./GoatTool', '-q'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: No file specified.\n")
+
+    def test_print_permissions_multiple_files(self):
+        temp_file1_path = self.create_temp_file("Content")
+        temp_file2_path = self.create_temp_file("Content")
+        self.set_file_permissions(temp_file1_path, 0o755)  # 755 permissions
+        self.set_file_permissions(temp_file2_path, 0o644)  # 644 permissions
+        result = subprocess.run(['./GoatTool', '-q', temp_file1_path, temp_file2_path], capture_output=True, text=True)
+        os.remove(temp_file1_path)
+        os.remove(temp_file2_path)
+        expected_output = f"Permissions of {os.path.basename(temp_file1_path)}: 755\nPermissions of {os.path.basename(temp_file2_path)}: 644\n"
+        self.assertEqual(result.stdout, expected_output)
+
+    def test_print_permissions_directory(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        result = subprocess.run(['./GoatTool', '-q', temp_dir.name], capture_output=True, text=True)
+        temp_dir.cleanup()
+        self.assertEqual(result.stdout, "ERROR: Path is a directory, not a file.\n")
+
+# TODO: Tests for -n switch
+
+
+# TODO: Tests for -h switch
 
 
 if __name__ == '__main__':

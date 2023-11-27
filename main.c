@@ -52,18 +52,26 @@ int main(int argc, char *argv[]) {
             }
         }
     } else if (strcmp(switch_arg, "-q") == 0) {
-        // Print permissions of file(s)
-        for (int i = 2; i < argc; i++) {
-            int permissions = get_file_permissions(argv[i]);
-            printf("Permissions of %s: %03o\n", argv[i], permissions);
+        if (argc == 2) {
+            printf("ERROR: No file specified.\n");
+        } else {
+            for (int i = 2; i < argc; i++) {
+                int permissions = get_file_permissions(argv[i]);
+                if (permissions != -1) {
+                    printf("Permissions of %s: %03o\n", custom_basename(argv[i]), permissions);
+                }
+            }
         }
     } else if (strcmp(switch_arg, "-m") == 0) {
-        // Merge multiple files into one
         if (argc < 4) {
-            printf("Error: Insufficient arguments for merge operation\n");
-            return 1;
+            printf("ERROR: Files to merge not specified.\n");
+        } else if (argc == 4) {
+            // When only two arguments are provided, destination file is not specified
+            printf("ERROR: Destination file not specified.\n");
+        } else {
+            // When there are more than two arguments, proceed with merge
+            merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
         }
-        merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
     } else if (strcmp(switch_arg, "-c") == 0) {
         // Compress file into .goat format
         if (argc != 4) {
