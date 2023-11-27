@@ -3,6 +3,7 @@ import tempfile
 import unittest
 import os
 import stat
+import shutil
 
 # Base case tests (shared functions)
 class BaseTestGoatTool(unittest.TestCase):
@@ -11,6 +12,11 @@ class BaseTestGoatTool(unittest.TestCase):
         temp_file.write(content)
         temp_file.close()
         return temp_file.name
+    
+    def create_temp_directory(self, name="new_directory"):
+        temp_dir = os.path.join(tempfile.gettempdir(), name)
+        os.makedirs(temp_dir, exist_ok=True)
+        return temp_dir
     
     def set_file_permissions(self, file_path, permissions):
         os.chmod(file_path, permissions)
@@ -236,6 +242,40 @@ class TestGoatToolPrintPermissions(BaseTestGoatTool):
         self.assertEqual(result.stdout, "ERROR: Path is a directory, not a file.\n")
 
 # TODO: Tests for -n switch
+class TestGoatToolMoveAndRename(BaseTestGoatTool):
+    def test_move_and_rename_file_successfully(self):
+        old_file_path = self.create_temp_file("Content")
+        new_directory = self.create_temp_directory()
+        new_file_name = "newfile.txt"
+        new_file_path = os.path.join(new_directory, new_file_name)
+        result = subprocess.run(['./GoatTool', '-n', old_file_path, new_directory, new_file_name], capture_output=True, text=True)
+        
+        file_moved = not os.path.exists(old_file_path) and os.path.exists(new_file_path)
+        shutil.rmtree(new_directory)
+        self.assertTrue(file_moved, "File was not moved and renamed successfully")
+
+
+    def test_move_nonexistent_file(self):
+        new_directory = self.create_temp_directory()
+        result = subprocess.run(['./GoatTool', '-n', 'nonexistent_file.txt', new_directory, 'newfile.txt'], capture_output=True, text=True)
+        shutil.rmtree(new_directory)
+        self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+
+    def test_move_no_source_file_specified(self):
+        result = subprocess.run(['./GoatTool', '-n'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: Source file not specified.\n")
+
+    def test_move_no_destination_specified(self):
+        old_file_path = self.create_temp_file("Content")
+        result = subprocess.run(['./GoatTool', '-n', old_file_path], capture_output=True, text=True)
+        os.remove(old_file_path)
+        self.assertEqual(result.stdout, "ERROR: Destination path or new name not specified.\n")
+
+    def test_move_to_nonexistent_directory(self):
+        old_file_path = self.create_temp_file("Content")
+        result = subprocess.run(['./GoatTool', '-n', old_file_path, 'nonexistent_directory/', 'newfile.txt'], capture_output=True, text=True)
+        os.remove(old_file_path)
+        self.assertEqual(result.stdout, "ERROR: Destination directory does not exist.\n")
 
 
 # TODO: Tests for -h switch

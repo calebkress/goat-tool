@@ -3,6 +3,9 @@
 #include "headers/utilities.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <libgen.h> 
+#include <limits.h>
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -152,12 +155,34 @@ int main(int argc, char *argv[]) {
         free(compressed_content);
         free(decompressed_content);
     } else if (strcmp(switch_arg, "-n") == 0) {
-        // Move a file
-        if (argc != 4) {
-            printf("Error: Incorrect number of arguments for move operation\n");
-            return 1;
+        // Check if required arguments are provided
+        if (argc < 4) {
+            // Determine specific error based on number of arguments
+            if (argc == 2) {
+                printf("ERROR: Source file not specified.\n");
+            } else if (argc == 3) {
+                printf("ERROR: Destination path or new name not specified.\n");
+            } else {
+                printf("Error: Incorrect number of arguments for move operation\n");
+            }
+        } else {
+            // Before attempting to move, check if source file exists
+            if (access(argv[2], F_OK) != 0) {
+                printf("ERROR: File does not exist.\n");
+            } else {
+                // Extract directory from destination path and check if it exists
+                char dest_dir[PATH_MAX];
+                strcpy(dest_dir, argv[3]);
+                dirname(dest_dir);
+                if (access(dest_dir, F_OK) != 0) {
+                    printf("ERROR: Destination directory does not exist.\n");
+                } else {
+                    // Perform the move operation
+                    move_file(argv[2], argv[3]);
+                    printf("File moved and renamed successfully.\n");
+                }
+            }
         }
-        move_file(argv[2], argv[3]);
     } else if (strcmp(switch_arg, "-h") == 0) {
         // Display help page
         display_help_page();
