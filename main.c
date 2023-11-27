@@ -3,6 +3,9 @@
 #include "headers/utilities.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <libgen.h> 
+#include <limits.h>
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -52,18 +55,26 @@ int main(int argc, char *argv[]) {
             }
         }
     } else if (strcmp(switch_arg, "-q") == 0) {
-        // Print permissions of file(s)
-        for (int i = 2; i < argc; i++) {
-            int permissions = get_file_permissions(argv[i]);
-            printf("Permissions of %s: %03o\n", argv[i], permissions);
+        if (argc == 2) {
+            printf("ERROR: No file specified.\n");
+        } else {
+            for (int i = 2; i < argc; i++) {
+                int permissions = get_file_permissions(argv[i]);
+                if (permissions != -1) {
+                    printf("Permissions of %s: %03o\n", custom_basename(argv[i]), permissions);
+                }
+            }
         }
     } else if (strcmp(switch_arg, "-m") == 0) {
-        // Merge multiple files into one
         if (argc < 4) {
-            printf("Error: Insufficient arguments for merge operation\n");
-            return 1;
+            printf("ERROR: Files to merge not specified.\n");
+        } else if (argc == 4) {
+            // When only two arguments are provided, destination file is not specified
+            printf("ERROR: Destination file not specified.\n");
+        } else {
+            // When there are more than two arguments, proceed with merge
+            merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
         }
-        merge_files((const char* const*)(argv + 2), argc - 3, argv[argc - 1]);
     } else if (strcmp(switch_arg, "-c") == 0) {
         // Compress file into .goat format
         if (argc != 4) {
@@ -144,12 +155,34 @@ int main(int argc, char *argv[]) {
         free(compressed_content);
         free(decompressed_content);
     } else if (strcmp(switch_arg, "-n") == 0) {
-        // Move a file
-        if (argc != 4) {
-            printf("Error: Incorrect number of arguments for move operation\n");
-            return 1;
+        // Check if required arguments are provided
+        if (argc < 4) {
+            // Determine specific error based on number of arguments
+            if (argc == 2) {
+                printf("ERROR: Source file not specified.\n");
+            } else if (argc == 3) {
+                printf("ERROR: Destination path or new name not specified.\n");
+            } else {
+                printf("Error: Incorrect number of arguments for move operation\n");
+            }
+        } else {
+            // Before attempting to move, check if source file exists
+            if (access(argv[2], F_OK) != 0) {
+                printf("ERROR: File does not exist.\n");
+            } else {
+                // Extract directory from destination path and check if it exists
+                char dest_dir[PATH_MAX];
+                strcpy(dest_dir, argv[3]);
+                dirname(dest_dir);
+                if (access(dest_dir, F_OK) != 0) {
+                    printf("ERROR: Destination directory does not exist.\n");
+                } else {
+                    // Perform the move operation
+                    move_file(argv[2], argv[3]);
+                    printf("File moved and renamed successfully.\n");
+                }
+            }
         }
-        move_file(argv[2], argv[3]);
     } else if (strcmp(switch_arg, "-h") == 0) {
         // Display help page
         display_help_page();

@@ -17,6 +17,9 @@ char* read_file(const char* file_path);
 // Function to write content to a file
 void write_to_file(FILE* file, const char* content);
 
+// Helper function to extract basename from file path
+char* custom_basename(char* path);
+
 // Function to get size of a file
 size_t get_file_size(const char* file_path);
 

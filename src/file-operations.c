@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <libgen.h>
+#include <unistd.h>
 
 // Open a file with specified path and mode
 FILE* open_file(const char* file_path, const char* mode) {
@@ -90,17 +92,37 @@ size_t get_file_size(const char* file_path) {
     return size;
 }
 
+// Helper function to extract basename from file path
+char* custom_basename(char* path) {
+    char* base = strrchr(path, '/');
+    return base ? base + 1 : path;
+}
+
 // Retrieve permissions of given file
 int get_file_permissions(const char* file_path) {
-    // Define struct of type stat to get file info
     struct stat st;
+
+    // Check if the file exists
+    if (access(file_path, F_OK) != 0) {
+        printf("ERROR: File does not exist.\n");
+        return -1;
+    }
+
+    // Check if it's a directory
+    if (stat(file_path, &st) == 0 && S_ISDIR(st.st_mode)) {
+        printf("ERROR: Path is a directory, not a file.\n");
+        return -1;
+    }
+
+    // Retrieve and return file permissions
     if (stat(file_path, &st) == 0) {
-        return st.st_mode & 0777;  // Return file permissions, isolating permission bits
+        return st.st_mode & 0777;  // Return file permissions
     } else {
         perror("Error getting file permissions");
         return -1;  // Return -1 on error
     }
 }
+
 
 // Multithreading setup
 // Struct for thread args
@@ -118,11 +140,26 @@ void* read_file_thread(void* args) {
 
 // Merge multiple files into a single file using multithreading
 void merge_files(const char* const* input_paths, int num_files, const char* output_path) {
+    // Check if output directory exists
+    char* output_dir = strdup(output_path);
+    char* dir = dirname(output_dir);
+    if (access(dir, F_OK) != 0) {
+        printf("ERROR: Destination directory does not exist.\n");
+        free(output_dir);
+        return;
+    }
+    free(output_dir);
+
+    // Create threads and args for each file
     pthread_t threads[num_files];
     ThreadArgs thread_args[num_files];
 
-    // Create threads for each file
+    // Check if each input file exists
     for (int i = 0; i < num_files; ++i) {
+        if (access(input_paths[i], F_OK) != 0) {
+            printf("ERROR: %s does not exist.\n", input_paths[i]);
+            return; // Early return if any file doesn't exist
+        }
         thread_args[i].file_path = input_paths[i];
         pthread_create(&threads[i], NULL, read_file_thread, &thread_args[i]);
     }
@@ -138,10 +175,11 @@ void merge_files(const char* const* input_paths, int num_files, const char* outp
         for (int i = 0; i < num_files; ++i) {
             if (thread_args[i].content) {
                 write_to_file(output_file, thread_args[i].content);
-                free(thread_args[i].content);  // Free memory allocated in thread
+                free(thread_args[i].content); // Free memory allocated in thread
             }
         }
         close_file(output_file);
+        printf("Files merged successfully.\n");
     }
 }
 
