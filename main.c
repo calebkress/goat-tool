@@ -99,11 +99,15 @@ int main(int argc, char *argv[]) {
 
         // Compress content
         compress_content(input_content, compressed_content);
-
+        //change file format
+        int old_name_len = strlen(argv[3]);
+        char* new_name = malloc(old_name_len * sizeof(char));
+        strcpy(new_name,argv[3]);
+        
         // Write compressed content to output file
         FILE* output_file = open_file(argv[3], "w");
         if (!output_file) {
-            printf("Error: Unable to open file %s for writing\n", argv[3]);
+            printf("Error: Unable to open file %p for writing\n", argv[3]);
             free(input_content);
             free(compressed_content);
             return 1;
