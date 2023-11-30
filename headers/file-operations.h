@@ -32,4 +32,9 @@ void merge_files(const char* const* input_paths, int num_files, const char* outp
 // Function to move a file from one path to another
 void move_file(const char* source_path, const char* destination_path);
 
+// Function to change file extension to .goat
+char* change_extension_to_goat(const char *file_path);
+
+// Function to change file extension to .tct
+char* change_extension_to_txt(const char *file_path);
 #endif

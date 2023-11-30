@@ -188,4 +188,70 @@ void move_file(const char* source_path, const char* destination_path) {
     if (rename(source_path, destination_path) != 0) {
         perror("Error moving file");  // Print error if rename fails
     }
+
 }
+char* change_extension_to_goat(const char *file_path) {
+    if (file_path == NULL) {
+        return NULL;
+    }
+
+    // Find the length of the file path
+    int path_len = strlen(file_path);
+
+    // Calculate the new length: length of path + length of ".goat" - length of old extension
+    int new_path_len = path_len;
+    for (int i = path_len - 1; i >= 0; i--) {
+        if (file_path[i] == '.') {
+            new_path_len = i + 5; // 4 for "goat" and 1 for '\0'
+            break;
+        }
+    }
+
+    // Allocate memory for the new file path
+    char *new_path = (char *)malloc(new_path_len * sizeof(char));
+    if (new_path == NULL) {
+        perror("Failed to allocate memory");
+        return NULL;
+    }
+
+    // Copy the file path up to the last '.'
+    strncpy(new_path, file_path, new_path_len - 5);
+
+    // Add the new extension
+    strcpy(new_path + new_path_len - 5, ".goat");
+
+    return new_path;
+}
+char* change_extension_to_txt(const char *file_path) {
+    if (file_path == NULL) {
+        return NULL;
+    }
+
+    // Find the length of the file path
+    int path_len = strlen(file_path);
+
+    // Calculate the new length: length of path + length of ".txt" - length of old extension
+    int new_path_len = path_len;
+    for (int i = path_len - 1; i >= 0; i--) {
+        if (file_path[i] == '.') {
+            new_path_len = i + 4; // 3 for "txt" and 1 for '\0'
+            break;
+        }
+    }
+
+    // Allocate memory for the new file path
+    char *new_path = (char *)malloc(new_path_len * sizeof(char));
+    if (new_path == NULL) {
+        perror("Failed to allocate memory");
+        return NULL;
+    }
+
+    // Copy the file path up to the last '.'
+    strncpy(new_path, file_path, new_path_len - 4);
+
+    // Add the new extension
+    strcpy(new_path + new_path_len - 4, ".txt");
+
+    return new_path;
+}
+

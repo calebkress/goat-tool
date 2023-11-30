@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        // Read content of input file
+        // Read content of source file (normal.txt)
         char* input_content = read_file(argv[2]);
         if (!input_content) {
             printf("Error: Unable to read file %s\n", argv[2]);
@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) {
         // Compress content
         compress_content(input_content, compressed_content);
 
-        // Write compressed content to output file
-        FILE* output_file = open_file(argv[3], "w");
+        // Write compressed content to compressed.txt
+        FILE* output_file = fopen(argv[3], "w");
         if (!output_file) {
             printf("Error: Unable to open file %s for writing\n", argv[3]);
             free(input_content);
@@ -109,19 +109,36 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         write_to_file(output_file, compressed_content);
+        fclose(output_file);
+
+        // Rename compressed.txt to compressed.goat
+        char* new_name = change_extension_to_goat(argv[3]);
+        if (!new_name) {
+            printf("Error: Memory allocation failed for new file name\n");
+            free(input_content);
+            free(compressed_content);
+            return 1;
+        }
+        if (rename(argv[3], new_name) != 0) {
+            perror("Error renaming file");
+            free(new_name);
+            free(input_content);
+            free(compressed_content);
+            return 1;
+        }
 
         // Clean up
-        close_file(output_file);
+        free(new_name);
         free(input_content);
         free(compressed_content);
-    } else if (strcmp(switch_arg, "-d") == 0) {
+    }else if (strcmp(switch_arg, "-d") == 0) {
         // Decompress a .goat file
-        if (argc != 4) {
+        if (argc != 3) {
             printf("Error: Incorrect number of arguments for decompression operation\n");
             return 1;
         }
 
-        // Step 1: Read the content of the compressed input file
+        // Step 1: Read the content of the compressed input file (file.goat)
         char* compressed_content = read_file(argv[2]);
         if (!compressed_content) {
             printf("Error: Unable to read file %s\n", argv[2]);
@@ -129,7 +146,6 @@ int main(int argc, char *argv[]) {
         }
 
         // Prepare buffer for decompressed content
-        // Assuming decompressed content might be larger than the compressed data
         char* decompressed_content = malloc(strlen(compressed_content) * 2); // Allocate enough memory
         if (!decompressed_content) {
             printf("Error: Memory allocation failed\n");
@@ -140,21 +156,32 @@ int main(int argc, char *argv[]) {
         // Decompress content
         decompress_content(compressed_content, decompressed_content);
 
-        // Write decompressed content to output file
-        FILE* output_file = open_file(argv[3], "w");
+        // Write decompressed content back to the same .goat file
+        FILE* output_file = fopen(argv[2], "w");
         if (!output_file) {
-            printf("Error: Unable to open file %s for writing\n", argv[3]);
+            printf("Error: Unable to open file %s for writing\n", argv[2]);
             free(compressed_content);
             free(decompressed_content);
             return 1;
         }
         write_to_file(output_file, decompressed_content);
+        fclose(output_file);
+
+        // Rename the .goat file to .txt
+        char* new_name = change_extension_to_txt(argv[2]);
+        if (rename(argv[2], new_name) != 0) {
+            perror("Error renaming file");
+            free(new_name);
+            free(compressed_content);
+            free(decompressed_content);
+            return 1;
+        }
 
         // Clean up
-        close_file(output_file);
+        free(new_name);
         free(compressed_content);
         free(decompressed_content);
-    } else if (strcmp(switch_arg, "-n") == 0) {
+    }else if (strcmp(switch_arg, "-n") == 0) {
         // Check if required arguments are provided
         if (argc < 4) {
             // Determine specific error based on number of arguments
