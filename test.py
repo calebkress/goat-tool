@@ -344,7 +344,15 @@ class TestGoatToolDefaultCase(BaseTestGoatTool):
         result = subprocess.run(['./GoatTool'], capture_output=True, text=True)
         expected_help_page = (
             "GoatTool Help Page:\n"
-            # ... same content as above ...
+            " -p <file_paths>       Print the contents of one or more files.\n"
+            " -g <file_path> <search_string> Search a file for a particular string and print matching lines.\n"
+            " -s <file_paths>       Print the size of one or more files.\n"
+            " -m <file_paths> <output_path> Merge multiple files into a single file.\n"
+            " -c <input_file_path> <output_file_path> Compress a text file into the .goat format.\n"
+            " -d <input_file_path> <output_file_path> Decompress a .goat file to retrieve the original text.\n"
+            " -q <file_paths>       Print the permissions of one or more files as an integer (000 to 777).\n"
+            " -n <source_path> <destination_path> <new_name> Move a file to a new location with a new name.\n"
+            " -h                   Print this help page.\n"
         )
         self.assertEqual(result.stdout, expected_help_page, "Default behavior did not display expected help page")
 
