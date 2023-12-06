@@ -1,0 +1,147 @@
+FFFFFFFFFF........F.F.F...................
+======================================================================
+FAIL: test_compress_no_input_file (__main__.TestGoatToolCompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 193, in test_compress_no_input_file
+    self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
+AssertionError: 'Error: Incorrect number of arguments for compression operation\n' != 'ERROR: Input file not specified.\n'
+- Error: Incorrect number of arguments for compression operation
++ ERROR: Input file not specified.
+
+
+======================================================================
+FAIL: test_compress_no_output_file (__main__.TestGoatToolCompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 199, in test_compress_no_output_file
+    self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
+AssertionError: 'Error: Incorrect number of arguments for compression operation\n' != 'ERROR: Output file not specified.\n'
+- Error: Incorrect number of arguments for compression operation
++ ERROR: Output file not specified.
+
+
+======================================================================
+FAIL: test_compress_nonexistent_file (__main__.TestGoatToolCompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 189, in test_compress_nonexistent_file
+    self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+AssertionError: 'Error: Unable to read file nonexistent_file.txt\n' != 'ERROR: File does not exist.\n'
+- Error: Unable to read file nonexistent_file.txt
++ ERROR: File does not exist.
+
+
+======================================================================
+FAIL: test_compress_unsupported_format (__main__.TestGoatToolCompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 207, in test_compress_unsupported_format
+    self.assertEqual(result.stdout, "ERROR: Unsupported file format for compression.\n")
+AssertionError: 'Error: Unable to read file /var/folders/63[47 chars]oc\n' != 'ERROR: Unsupported file format for compression.\n'
+- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmp_c41c2h3.doc
++ ERROR: Unsupported file format for compression.
+
+
+======================================================================
+FAIL: test_compress_valid_file (__main__.TestGoatToolCompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 183, in test_compress_valid_file
+    self.assertEqual(result.stdout, "File compressed successfully.\n")
+AssertionError: '' != 'File compressed successfully.\n'
++ File compressed successfully.
+
+
+======================================================================
+FAIL: test_decompress_no_input_file (__main__.TestGoatToolDecompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 233, in test_decompress_no_input_file
+    self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
+AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Input file not specified.\n'
+- Error: Incorrect number of arguments for decompression operation
++ ERROR: Input file not specified.
+
+
+======================================================================
+FAIL: test_decompress_no_output_file (__main__.TestGoatToolDecompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 239, in test_decompress_no_output_file
+    self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
+AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Output file not specified.\n'
+- Error: Incorrect number of arguments for decompression operation
++ ERROR: Output file not specified.
+
+
+======================================================================
+FAIL: test_decompress_nonexistent_file (__main__.TestGoatToolDecompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 229, in test_decompress_nonexistent_file
+    self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+AssertionError: 'Error: Unable to read file nonexistent_file.goat\n' != 'ERROR: File does not exist.\n'
+- Error: Unable to read file nonexistent_file.goat
++ ERROR: File does not exist.
+
+
+======================================================================
+FAIL: test_decompress_unsupported_format (__main__.TestGoatToolDecompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 247, in test_decompress_unsupported_format
+    self.assertEqual(result.stdout, "ERROR: Unsupported file format for decompression.\n")
+AssertionError: 'Error: Unable to read file /var/folders/63[47 chars]oc\n' != 'ERROR: Unsupported file format for decompression.\n'
+- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmpqqv_vw16.doc
++ ERROR: Unsupported file format for decompression.
+
+
+======================================================================
+FAIL: test_decompress_valid_file (__main__.TestGoatToolDecompressFunction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 225, in test_decompress_valid_file
+    self.assertEqual(result.stdout, "File decompressed successfully.\n")
+AssertionError: '' != 'File decompressed successfully.\n'
++ File decompressed successfully.
+
+
+======================================================================
+FAIL: test_merge_no_destination_file_specified (__main__.TestGoatToolMergeFiles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 159, in test_merge_no_destination_file_specified
+    self.assertEqual(result.stdout, "ERROR: Destination file not specified.\n")
+AssertionError: 'ERROR: Files to merge not specified.\n' != 'ERROR: Destination file not specified.\n'
+- ERROR: Files to merge not specified.
++ ERROR: Destination file not specified.
+
+
+======================================================================
+FAIL: test_merge_to_nonexistent_directory (__main__.TestGoatToolMergeFiles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 165, in test_merge_to_nonexistent_directory
+    self.assertIn("ERROR: Destination directory does not exist.", result.stdout)
+AssertionError: 'ERROR: Destination directory does not exist.' not found in 'ERROR: Destination file not specified.\n'
+
+======================================================================
+FAIL: test_move_and_rename_file_successfully (__main__.TestGoatToolMoveAndRename)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/calebkress/Repos/goat-tool/test.py", line 298, in test_move_and_rename_file_successfully
+    self.assertTrue(file_moved, "File was not moved and renamed successfully")
+AssertionError: False is not true : File was not moved and renamed successfully
+
+----------------------------------------------------------------------
+Ran 42 tests in 0.244s
+
+FAILED (failures=13)
+STDOUT: 
+STDERR: 
+STDOUT: 
+STDERR: Error opening file.: No such file or directory
+
+STDOUT: 
+STDERR: 
