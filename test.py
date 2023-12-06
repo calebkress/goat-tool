@@ -164,43 +164,88 @@ class TestGoatToolMergeFiles(BaseTestGoatTool):
         os.remove(file1_path)
         self.assertIn("ERROR: Destination directory does not exist.", result.stdout)
 
-# TODO: Tests for -c switch
-# class TestGoatToolCompressFunction(unittest.TestCase):
+# Tests for -c switch
+class TestGoatToolCompressFunction(BaseTestGoatTool):
 
-#     def test_compress_file_ssuccessfully(self):
-#         temp_file_path = self.create_temp_file("Normal file content", ".txt")
-#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
-#         result = subprocess.run(['./GoatTool', '-c', temp_file_path, compressed_file_path], 
-#         capture_output=True, text=True)
-#         os.remove(temp_file_path)
-#         os.remove(compressed_file_path)
-#         self.assertEqual(result.stdout, "File compressed successfully.\n")
+    def test_compress_valid_file(self):
+        original_content = "hhhhTTTTT mmmmmmmsss"
+        expected_compressed_content = "h4T5 m7s3"
+        input_file_path = self.create_temp_file(original_content, ".txt")
+        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+        result = subprocess.run(['./GoatTool', '-c', input_file_path, output_file_path], capture_output=True, text=True)
+        
+        with open(output_file_path, 'r') as file:
+            compressed_content = file.read()
 
-#     def test_compress_nonexistent_file(self):
-#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
-#         result = subprocess.run(['./GoatTool', '-c', 'nonexistent_file.txt', compressed_file_path], capture_output=True, text=True)
-#         os.remove(compressed_file_path)
-#         self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+        os.remove(input_file_path)
+        os.remove(output_file_path)
+        self.assertEqual(compressed_content, expected_compressed_content)
+        self.assertEqual(result.stdout, "File compressed successfully.\n")
 
-#     def test_compress_no_input_file_specified(self):
-#         result = subprocess.run(['./GoatTool', '-c'], capture_output=True, text=True)
-#         self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
+    def test_compress_nonexistent_file(self):
+        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+        result = subprocess.run(['./GoatTool', '-c', 'nonexistent_file.txt', output_file_path], capture_output=True, text=True)
+        os.remove(output_file_path)
+        self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
 
-#     def test_compress_no_output_file_specified(self):
-#         temp_file_path = self.create_temp_file("Normal file content", ".txt")
-#         result = subprocess.run(['./GoatTool', '-c', temp_file_path], capture_output=True, text=True)
-#         os.remove(temp_file_path)
-#         self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
+    def test_compress_no_input_file(self):
+        result = subprocess.run(['./GoatTool', '-c'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
 
-#     def test_compress_unsupported_format(self):
-#         temp_file_path = self.create_temp_file("Content", ".doc")
-#         compressed_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
-#         result = subprocess.run(['./GoatTool', '-c', temp_file_path, compressed_file_path], capture_output=True, text=True)
-#         os.remove(temp_file_path)
-#         os.remove(compressed_file_path)
-#         self.assertEqual(result.stdout, "ERROR: Unsupported file format for compression.\n")
+    def test_compress_no_output_file(self):
+        input_file_path = self.create_temp_file("Some content", ".txt")
+        result = subprocess.run(['./GoatTool', '-c', input_file_path], capture_output=True, text=True)
+        os.remove(input_file_path)
+        self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
 
-# TODO: Tests for -d switch
+    def test_compress_unsupported_format(self):
+        input_file_path = self.create_temp_file("Content", ".doc")
+        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".goat").name
+        result = subprocess.run(['./GoatTool', '-c', input_file_path, output_file_path], capture_output=True, text=True)
+        os.remove(input_file_path)
+        os.remove(output_file_path)
+        self.assertEqual(result.stdout, "ERROR: Unsupported file format for compression.\n")
+
+# Tests for -d switch
+class TestGoatToolDecompressFunction(BaseTestGoatTool):
+
+    def test_decompress_valid_file(self):
+        compressed_content = "h4T5 m7s3"
+        expected_decompressed_content = "hhhhTTTTT mmmmmmmsss"
+        compressed_file_path = self.create_temp_file(compressed_content, ".goat")
+        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt").name
+        result = subprocess.run(['./GoatTool', '-d', compressed_file_path, output_file_path], capture_output=True, text=True)
+        
+        with open(output_file_path, 'r') as file:
+            decompressed_content = file.read()
+
+        os.remove(compressed_file_path)
+        os.remove(output_file_path)
+        self.assertEqual(decompressed_content, expected_decompressed_content)
+        self.assertEqual(result.stdout, "File decompressed successfully.\n")
+
+    def test_decompress_nonexistent_file(self):
+        result = subprocess.run(['./GoatTool', '-d', 'nonexistent_file.goat', 'normal.txt'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+
+    def test_decompress_no_input_file(self):
+        result = subprocess.run(['./GoatTool', '-d'], capture_output=True, text=True)
+        self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
+
+    def test_decompress_no_output_file(self):
+        compressed_file_path = self.create_temp_file("Simulated compressed content", ".goat")
+        result = subprocess.run(['./GoatTool', '-d', compressed_file_path], capture_output=True, text=True)
+        os.remove(compressed_file_path)
+        self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
+
+    def test_decompress_unsupported_format(self):
+        compressed_file_path = self.create_temp_file("Simulated content", ".doc")
+        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt").name
+        result = subprocess.run(['./GoatTool', '-d', compressed_file_path, output_file_path], capture_output=True, text=True)
+        os.remove(compressed_file_path)
+        os.remove(output_file_path)
+        self.assertEqual(result.stdout, "ERROR: Unsupported file format for decompression.\n")
+
 
 
 # Tests for -q switch
@@ -213,8 +258,6 @@ class TestGoatToolPrintPermissions(BaseTestGoatTool):
         os.remove(temp_file_path)
         expected_output = f"Permissions of {os.path.basename(temp_file_path)}: 755\n"
         self.assertEqual(result.stdout, expected_output)
-
-
 
     def test_print_permissions_nonexistent_file(self):
         result = subprocess.run(['./GoatTool', '-q', 'nonexistent_file.txt'], capture_output=True, text=True)
@@ -277,8 +320,33 @@ class TestGoatToolMoveAndRename(BaseTestGoatTool):
         os.remove(old_file_path)
         self.assertEqual(result.stdout, "ERROR: Destination directory does not exist.\n")
 
+# Tests for -h switch
+class TestGoatToolHelpPage(BaseTestGoatTool):
+    def test_display_help_page(self):
+        result = subprocess.run(['./GoatTool', '-h'], capture_output=True, text=True)
+        expected_help_page = (
+            "GoatTool Help Page:\n"
+            " -p <file_paths>       Print the contents of one or more files.\n"
+            " -g <file_path> <search_string> Search a file for a particular string and print matching lines.\n"
+            " -s <file_paths>       Print the size of one or more files.\n"
+            " -m <file_paths> <output_path> Merge multiple files into a single file.\n"
+            " -c <input_file_path> <output_file_path> Compress a text file into the .goat format.\n"
+            " -d <input_file_path> <output_file_path> Decompress a .goat file to retrieve the original text.\n"
+            " -q <file_paths>       Print the permissions of one or more files as an integer (000 to 777).\n"
+            " -n <source_path> <destination_path> <new_name> Move a file to a new location with a new name.\n"
+            " -h                   Print this help page.\n"
+        )
+        self.assertEqual(result.stdout, expected_help_page, "Help page content does not match expected output")
 
-# TODO: Tests for -h switch
+# Tests for default case
+class TestGoatToolDefaultCase(BaseTestGoatTool):
+    def test_default_behavior_display_help_page(self):
+        result = subprocess.run(['./GoatTool'], capture_output=True, text=True)
+        expected_help_page = (
+            "GoatTool Help Page:\n"
+            # ... same content as above ...
+        )
+        self.assertEqual(result.stdout, expected_help_page, "Default behavior did not display expected help page")
 
 
 if __name__ == '__main__':
