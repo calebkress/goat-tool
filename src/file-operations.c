@@ -186,10 +186,12 @@ void merge_files(const char* const* input_paths, int num_files, const char* outp
 // Move a file from one path to another
 void move_file(const char* source_path, const char* destination_path) {
     if (rename(source_path, destination_path) != 0) {
-        perror("Error moving file");  // Print error if rename fails
+        perror("Error moving file");
+    } else {
+        printf("File moved successfully.\n");
     }
-
 }
+
 char* change_extension_to_goat(const char *file_path) {
     if (file_path == NULL) {
         return NULL;

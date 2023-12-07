@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <libgen.h> 
 #include <limits.h>
+#include <sys/stat.h> // for checking if destination is a directory
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -182,7 +183,6 @@ int main(int argc, char *argv[]) {
         free(compressed_content);
         free(decompressed_content);
     }else if (strcmp(switch_arg, "-n") == 0) {
-        // Check if required arguments are provided
         if (argc < 4) {
             // Determine specific error based on number of arguments
             if (argc == 2) {
@@ -193,20 +193,24 @@ int main(int argc, char *argv[]) {
                 printf("Error: Incorrect number of arguments for move operation\n");
             }
         } else {
-            // Before attempting to move, check if source file exists
+            // Check if source file exists
             if (access(argv[2], F_OK) != 0) {
-                printf("ERROR: File does not exist.\n");
+                printf("ERROR: Source file does not exist.\n");
             } else {
-                // Extract directory from destination path and check if it exists
-                char dest_dir[PATH_MAX];
-                strcpy(dest_dir, argv[3]);
-                dirname(dest_dir);
-                if (access(dest_dir, F_OK) != 0) {
-                    printf("ERROR: Destination directory does not exist.\n");
+                struct stat statbuf;
+                if (stat(argv[3], &statbuf) != -1) {
+                    if (S_ISDIR(statbuf.st_mode)) {
+                        // Destination is a directory, construct new path
+                        char new_dest_path[PATH_MAX];
+                        snprintf(new_dest_path, sizeof(new_dest_path), "%s/%s", argv[3], basename(argv[2]));
+                        move_file(argv[2], new_dest_path);
+                    } else {
+                        // Destination is not a directory, use the provided path
+                        move_file(argv[2], argv[3]);
+                    }
                 } else {
-                    // Perform the move operation
-                    move_file(argv[2], argv[3]);
-                    printf("File moved and renamed successfully.\n");
+                    // Destination path does not exist
+                    printf("ERROR: Destination path does not exist.\n");
                 }
             }
         }
