@@ -213,16 +213,18 @@ class TestGoatToolDecompressFunction(BaseTestGoatTool):
         compressed_content = "h4T5 m7s3"
         expected_decompressed_content = "hhhhTTTTT mmmmmmmsss"
         compressed_file_path = self.create_temp_file(compressed_content, ".goat")
-        output_file_path = tempfile.NamedTemporaryFile(delete=False, suffix=".txt").name
-        result = subprocess.run(['./GoatTool', '-d', compressed_file_path, output_file_path], capture_output=True, text=True)
-        
-        with open(output_file_path, 'r') as file:
+        new_file_path = compressed_file_path.replace('.goat', '.txt')
+
+        subprocess.run(['./GoatTool', '-d', compressed_file_path], capture_output=True, text=True)
+
+        with open(new_file_path, 'r') as file:
             decompressed_content = file.read()
 
-        os.remove(compressed_file_path)
-        os.remove(output_file_path)
-        # self.assertEqual(decompressed_content, expected_decompressed_content)
-        self.assertEqual(result.stdout, "File decompressed successfully.\n")
+        self.assertEqual(decompressed_content, expected_decompressed_content)
+        
+        # Clean up
+        os.remove(new_file_path)
+
 
     def test_decompress_nonexistent_file(self):
         result = subprocess.run(['./GoatTool', '-d', 'nonexistent_file.goat', 'normal.txt'], capture_output=True, text=True)
@@ -234,9 +236,16 @@ class TestGoatToolDecompressFunction(BaseTestGoatTool):
 
     def test_decompress_no_output_file(self):
         compressed_file_path = self.create_temp_file("Simulated compressed content", ".goat")
+        new_file_path = compressed_file_path.replace('.goat', '.txt')  # Expecting a .txt file after decompression
+
         result = subprocess.run(['./GoatTool', '-d', compressed_file_path], capture_output=True, text=True)
-        os.remove(compressed_file_path)
-        self.assertEqual(result.stdout, "Error: Incorrect number of arguments for decompression operation\n")
+        
+        # Check for the existence of the new .txt file instead of trying to remove the .goat file
+        self.assertTrue(os.path.exists(new_file_path), "Decompressed .txt file not found")
+
+        # Clean up: remove the new .txt file if it exists
+        if os.path.exists(new_file_path):
+            os.remove(new_file_path)
 
     def test_decompress_unsupported_format(self):
         compressed_file_path = self.create_temp_file("Simulated content", ".doc")
