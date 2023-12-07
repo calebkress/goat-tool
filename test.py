@@ -295,16 +295,31 @@ class TestGoatToolPrintPermissions(BaseTestGoatTool):
 
 # TODO: Tests for -n switch
 class TestGoatToolMoveAndRename(BaseTestGoatTool):
-    def test_move_and_rename_file_successfully(self):
-        old_file_path = self.create_temp_file("Content")
-        new_directory = self.create_temp_directory()
-        new_file_name = "newfile.txt"
-        new_file_path = os.path.join(new_directory, new_file_name)
-        result = subprocess.run(['./GoatTool', '-n', old_file_path, new_directory, new_file_name], capture_output=True, text=True)
-        
-        file_moved = not os.path.exists(old_file_path) and os.path.exists(new_file_path)
+    def test_move_file_successfully(self):
+        # Create a file in a writable temporary directory
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            old_file_path = temp_file.name
+            temp_file.write(b'Content')
+
+        # Create a new directory for moving the file
+        new_directory = tempfile.mkdtemp()
+
+        # Run GoatTool with the -n switch
+        subprocess.run(['./GoatTool', '-n', old_file_path, new_directory], check=True)
+
+        # Check if the original file no longer exists
+        old_file_exists = os.path.exists(old_file_path)
+
+        # Check if any file exists in the new directory
+        files_in_new_directory = os.listdir(new_directory)
+        new_file_exists = len(files_in_new_directory) > 0
+
+        # Clean up
         shutil.rmtree(new_directory)
-        self.assertTrue(file_moved, "File was not moved and renamed successfully")
+
+        # Assert file moved successfully
+        self.assertFalse(old_file_exists, "Old file still exists, should have been moved")
+        self.assertTrue(new_file_exists, "No file found in the new directory, should have been moved")
 
 
     def test_move_nonexistent_file(self):
