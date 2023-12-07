@@ -311,7 +311,7 @@ class TestGoatToolMoveAndRename(BaseTestGoatTool):
         new_directory = self.create_temp_directory()
         result = subprocess.run(['./GoatTool', '-n', 'nonexistent_file.txt', new_directory, 'newfile.txt'], capture_output=True, text=True)
         shutil.rmtree(new_directory)
-        self.assertEqual(result.stdout, "ERROR: File does not exist.\n")
+        self.assertEqual(result.stdout, "ERROR: Source file does not exist.\n")
 
     def test_move_no_source_file_specified(self):
         result = subprocess.run(['./GoatTool', '-n'], capture_output=True, text=True)
@@ -327,7 +327,7 @@ class TestGoatToolMoveAndRename(BaseTestGoatTool):
         old_file_path = self.create_temp_file("Content")
         result = subprocess.run(['./GoatTool', '-n', old_file_path, 'nonexistent_directory/', 'newfile.txt'], capture_output=True, text=True)
         os.remove(old_file_path)
-        self.assertEqual(result.stdout, "ERROR: Destination directory does not exist.\n")
+        self.assertEqual(result.stdout, "ERROR: Destination path does not exist.\n")
 
 # Tests for -h switch
 class TestGoatToolHelpPage(BaseTestGoatTool):
