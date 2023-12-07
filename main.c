@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         // Read content of source file (normal.txt)
         char* input_content = read_file(argv[2]);
         if (!input_content) {
-            printf("Error: Unable to read file %s\n", argv[2]);
+            printf("Error: Unable to read file\n");
             return 1;
         }
 
@@ -126,6 +126,8 @@ int main(int argc, char *argv[]) {
             free(compressed_content);
             return 1;
         }
+
+        printf("File compressed successfully.\n");
 
         // Clean up
         free(new_name);
@@ -176,6 +178,8 @@ int main(int argc, char *argv[]) {
             free(decompressed_content);
             return 1;
         }
+
+        printf("File decompressed successfully.\n");
 
         // Clean up
         free(new_name);

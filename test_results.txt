@@ -39,7 +39,7 @@ Traceback (most recent call last):
   File "/Users/calebkress/Repos/goat-tool/test.py", line 207, in test_compress_unsupported_format
     self.assertEqual(result.stdout, "ERROR: Unsupported file format for compression.\n")
 AssertionError: 'Error: Unable to read file /var/folders/63[47 chars]oc\n' != 'ERROR: Unsupported file format for compression.\n'
-- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmp_c41c2h3.doc
+- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmpg63028z7.doc
 + ERROR: Unsupported file format for compression.
 
 
@@ -58,10 +58,12 @@ FAIL: test_decompress_no_input_file (__main__.TestGoatToolDecompressFunction)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
   File "/Users/calebkress/Repos/goat-tool/test.py", line 233, in test_decompress_no_input_file
-    self.assertEqual(result.stdout, "ERROR: Input file not specified.\n")
-AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Input file not specified.\n'
+    self.assertEqual(result.stdout, "ERROR: Incorrect number of arguments for decompression operation\n")
+AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Incorrect number of arguments for decompression operation\n'
 - Error: Incorrect number of arguments for decompression operation
-+ ERROR: Input file not specified.
+?  ^^^^
++ ERROR: Incorrect number of arguments for decompression operation
+?  ^^^^
 
 
 ======================================================================
@@ -69,10 +71,12 @@ FAIL: test_decompress_no_output_file (__main__.TestGoatToolDecompressFunction)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
   File "/Users/calebkress/Repos/goat-tool/test.py", line 239, in test_decompress_no_output_file
-    self.assertEqual(result.stdout, "ERROR: Output file not specified.\n")
-AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Output file not specified.\n'
+    self.assertEqual(result.stdout, "ERROR: Incorrect number of arguments for decompression operation\n")
+AssertionError: 'Error: Incorrect number of arguments for decompression operation\n' != 'ERROR: Incorrect number of arguments for decompression operation\n'
 - Error: Incorrect number of arguments for decompression operation
-+ ERROR: Output file not specified.
+?  ^^^^
++ ERROR: Incorrect number of arguments for decompression operation
+?  ^^^^
 
 
 ======================================================================
@@ -93,7 +97,7 @@ Traceback (most recent call last):
   File "/Users/calebkress/Repos/goat-tool/test.py", line 247, in test_decompress_unsupported_format
     self.assertEqual(result.stdout, "ERROR: Unsupported file format for decompression.\n")
 AssertionError: 'Error: Unable to read file /var/folders/63[47 chars]oc\n' != 'ERROR: Unsupported file format for decompression.\n'
-- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmpqqv_vw16.doc
+- Error: Unable to read file /var/folders/63/zkg6fq516zs4z5f0bc7n3mpw0000gn/T/tmpsy8bwg43.doc
 + ERROR: Unsupported file format for decompression.
 
 
@@ -135,7 +139,7 @@ Traceback (most recent call last):
 AssertionError: False is not true : File was not moved and renamed successfully
 
 ----------------------------------------------------------------------
-Ran 42 tests in 0.244s
+Ran 42 tests in 0.192s
 
 FAILED (failures=13)
 STDOUT: 
